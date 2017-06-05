@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+#
+# Build the hkjn/geth Docker image.
+#
+set -euo pipefail
+
+DOCKER_USER="hkjn"
+DOCKER_IMAGE="geth"
+ARCH="$(uname -m)"
+
+declare -A BUILDIMAGES
+BUILDIMAGES[x86_64]=hkjn/golang:x86_64
+BUILDIMAGES[armv7l]=hkjn/golang:armv7l-1.8.3
+
+BUILDIMAGE=${BUILDIMAGES[$ARCH]}
+BUILD_DIR="$(mktemp -d)"
+TAG="$DOCKER_USER/$DOCKER_IMAGE:$ARCH"
+
+sed "s|ARG_FROM|${BUILDIMAGE}|g" Dockerfile.build > $BUILD_DIR/Dockerfile.build
+cp Dockerfile $BUILD_DIR/
+cd $BUILD_DIR
+echo "Building geth binary in $BUILD_DIR.."
+docker rm geth-build || true
+docker build -t geth-build -f Dockerfile.build .
+docker run --name geth-build -it geth-build
+docker cp geth-build:/geth .
+docker cp geth-build:/lib/ld-musl-armhf.so.1 .
+docker rm geth-build
+echo "Building $TAG in $BUILD_DIR.."
+docker build -t $TAG .
+NO_PUSH=${NO_PUSH:-""}
+[[ "$NO_PUSH" ]] || docker push $TAG
