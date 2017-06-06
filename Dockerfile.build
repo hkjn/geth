@@ -7,7 +7,7 @@ USER go
 
 RUN git clone https://github.com/ethereum/go-ethereum.git
 RUN echo "Building geth with $(go version).."
-RUN cd go-ethereum && make geth && \
-    cp build/bin/geth /geth
+RUN cd go-ethereum && make geth
 # TODO: Try just doing 'go get -v github.com/ethereum/go-ethereum/cmd/geth'.
-CMD echo "Binary available in /geth."
+RUN ldd go-ethereum/build/bin/geth
+CMD echo "Binary available in $(pwd)/go-ethereum/build/bin/geth."

@@ -1,4 +1,5 @@
 FROM scratch
+ARG musl_so
 COPY ["geth", "/"]
-COPY ["ld-musl-armhf.so.1", "/lib/"]
+COPY ["$musl_so", "/lib/"]
 ENTRYPOINT ["/geth"]
