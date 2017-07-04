@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+watch -n 100 'echo eth.syncing | docker exec -i geth /geth attach'
