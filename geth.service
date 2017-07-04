@@ -17,8 +17,8 @@ ExecStartPre=-/usr/bin/docker rm geth
 ExecStart=/bin/bash -c " \
   docker run --name geth \
              -p 30303:30303 \
-             --memory=800m \
-             --cpu-shares=896 \
+             --memory=950m \
+             --cpu-shares=512 \
              -v /containers/eth_fast:/.ethereum \
              hkjn/geth:$(uname -m) --syncmode fast --cache 256 --verbosity 3 --metrics"
 Restart=always
