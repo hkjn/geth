@@ -4,34 +4,34 @@
 #
 set -euo pipefail
 
-DOCKER_USER="hkjn"
-DOCKER_IMAGE="geth"
-ARCH="$(uname -m)"
+declare DOCKER_USER="hkjn"
+declare DOCKER_IMAGE="geth"
+declare CPU_ARCH="$(uname -m)"
 
 declare -A BUILDIMAGES
 BUILDIMAGES[x86_64]=hkjn/golang:x86_64-1.8.3
 BUILDIMAGES[armv7l]=hkjn/golang:armv7l-1.8.3
-BUILDIMAGE=${BUILDIMAGES[$ARCH]}
+declare BUILDIMAGE=${BUILDIMAGES[${CPU_ARCH}]}
 
 declare -A MUSL_ARCHS
 MUSL_ARCHS[x86_64]=x86_64
 MUSL_ARCHS[armv7l]=armhf
-MUSL_ARCH=${MUSL_ARCHS[$ARCH]}
+declare MUSL_ARCH=${MUSL_ARCHS[${CPU_ARCH}]}
 
-BUILD_DIR="$(mktemp -d)"
-TAG="$DOCKER_USER/$DOCKER_IMAGE:$ARCH"
+declare BUILD_DIR="$(mktemp -d)"
+declare TAG="${DOCKER_USER}/${DOCKER_IMAGE}:${CPU_ARCH}"
 
-sed "s|ARG_FROM|${BUILDIMAGE}|g" Dockerfile.build > $BUILD_DIR/Dockerfile.build
-cp Dockerfile $BUILD_DIR/
-cd $BUILD_DIR
-echo "Building geth binary in $BUILD_DIR.."
+sed "s|ARG_FROM|${BUILDIMAGE}|g" Dockerfile.build > ${BUILD_DIR}/Dockerfile.build
+cp Dockerfile ${BUILD_DIR}/
+cd ${BUILD_DIR}
+echo "Building geth binary in ${BUILD_DIR}.."
 docker rm geth-build || true
 docker build -t geth-build -f Dockerfile.build .
 docker run --name geth-build -it geth-build
 docker cp geth-build:/home/go/go-ethereum/build/bin/geth .
 docker cp geth-build:/lib/ld-musl-$MUSL_ARCH.so.1 .
 docker rm geth-build
-echo "Building $TAG in $BUILD_DIR.."
-docker build --build-arg musl_so=ld-musl-$MUSL_ARCH.so.1 -t $TAG .
+echo "Building ${TAG} in ${BUILD_DIR}.."
+docker build --build-arg musl_so=ld-musl-${MUSL_ARCH}.so.1 -t ${TAG} .
 NO_PUSH=${NO_PUSH:-""}
 [[ "$NO_PUSH" ]] || docker push $TAG
