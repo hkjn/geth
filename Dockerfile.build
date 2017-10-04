@@ -1,13 +1,17 @@
 FROM ARG_FROM
+
+ENV GETH_VERSION=v1.7.1
 USER root
 RUN apk add --no-cache git make gcc musl-dev linux-headers ca-certificates
 USER go
 # Note: Can't disable cgo; needed for ./go-ethereum/crypto/secp256k1/...
 # TODO: Test building with cgo, but with flags to build static binary (--ldflags '-extldflags "-static"')
 
-RUN git clone https://github.com/ethereum/go-ethereum.git
-RUN echo "Building geth with $(go version).."
-RUN cd go-ethereum && make geth
+RUN git clone https://github.com/ethereum/go-ethereum.git && \
+    echo "Building geth with $(go version).." && \
+    cd go-ethereum && \
+    git checkout ${GETH_VERSION} && \
+    make geth
 # TODO: Try just doing 'go get -v github.com/ethereum/go-ethereum/cmd/geth'.
 RUN ldd go-ethereum/build/bin/geth
 CMD echo "Binary available in $(pwd)/go-ethereum/build/bin/geth."
