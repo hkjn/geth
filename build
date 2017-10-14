@@ -40,3 +40,9 @@ echo "Building ${TAG} in ${BUILD_DIR}.."
 docker build --build-arg musl_so=ld-musl-${MUSL_ARCH}.so.1 -t ${TAG} .
 NO_PUSH=${NO_PUSH:-""}
 [[ "$NO_PUSH" ]] || docker push $TAG
+
+if ! which manifest-tool 1>/dev/null; then
+	echo "FATAL: No manifest-tool found on PATH. Can't update manifest metadata for hkjn/geth." >&2
+	exit 1
+fi
+manifest-tool push from-args --platforms linux/amd64,linux/arm --template hkjn/geth:ARCH --target hkjn/geth
