@@ -1,6 +1,6 @@
 FROM ARG_FROM
 
-ENV GETH_VERSION=v1.7.1
+ENV GETH_VERSION=v1.7.2
 USER root
 RUN apk add --no-cache git make gcc musl-dev linux-headers ca-certificates
 USER go
