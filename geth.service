@@ -12,7 +12,7 @@ ExecStart=/bin/bash -c " \
              --memory=950m \
              --cpu-shares=512 \
              -v /containers/eth_fast:/.ethereum \
-             hkjn/geth --syncmode fast --cache 256 --verbosity 3 --metrics"
+             hkjn/geth --syncmode fast --cache 192 --verbosity 3 --metrics"
 Restart=always
 
 [Install]
